@@ -1,7 +1,7 @@
-import { FilterMethod } from '@/interface';
+import { FilterMethod, MapMethod, Monad, MonadClass } from '@/interface';
 import { hasValue } from '@/utils';
 
-class Maybe {
+class Maybe extends MonadClass {
   static just(a) {
     return new Just(a);
   }
@@ -22,19 +22,19 @@ class Maybe {
   }
 }
 
-class Just extends Maybe {
-  [x: string]: any;
+export class Just extends Maybe implements Monad {
+  private __value;
   constructor(value) {
     super();
-    this._value = value;
+    this.__value = value;
   }
 
   get value() {
-    return this._value;
+    return this.__value;
   }
 
-  map(f: (data: any) => any) {
-    return Just.of(f(this._value));
+  map(f: MapMethod) {
+    return Just.of(f(this.__value));
   }
 
   getOrElse() {
@@ -49,8 +49,8 @@ class Just extends Maybe {
     return true;
   }
 }
-class Nothing extends Maybe {
-  map(f: (data: any) => any) {
+export class Nothing extends Maybe implements Monad {
+  map(f: MapMethod) {
     return this;
   }
 

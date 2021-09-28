@@ -1,14 +1,14 @@
-import { FilterMethod, MapMethod } from '@/interface';
+import { FilterMethod, MapMethod, Monad } from '@/interface';
 import { hasValue } from '@/utils';
 
 class Either {
-  [x: string]: any;
+  private __value;
   constructor(value) {
-    this._value = value;
+    this.__value = value;
   }
 
   get value() {
-    return this._value;
+    return this.__value;
   }
 
   static left(a) {
@@ -27,7 +27,7 @@ class Either {
   }
 }
 
-class Left extends Either {
+export class Left extends Either implements Monad {
   map() {
     return this;
   }
@@ -55,7 +55,8 @@ class Left extends Either {
     return this;
   }
 }
-class Right extends Either {
+
+export class Right extends Either implements Monad {
   map(f: MapMethod) {
     return Either.of(f(this.value));
   }
@@ -79,3 +80,5 @@ class Right extends Either {
     return Either.fromNullable(f(this.value) ? this.value : null);
   }
 }
+
+export default Either;

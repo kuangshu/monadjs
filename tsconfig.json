@@ -11,7 +11,8 @@
     "strict": true,
     "paths": {
       "@/*": ["src/*"],
-      "@@/*": ["src/.umi/*"]
+      "@@/*": ["src/.umi/*"],
+      "ramda": ["location-of-types/npm-ramda-package/index"]
     },
     "allowSyntheticDefaultImports": true,
     "noImplicitAny": false
