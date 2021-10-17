@@ -1,4 +1,4 @@
-import { merge } from 'ramda';
+import { compose, merge, map } from 'ramda';
 import { ReactNode } from 'react';
 
 interface ErrorHandler {
@@ -9,29 +9,29 @@ interface ShowErrorMessage {
   (message: string | ReactNode): void;
 }
 
-interface HandlerMap extends Record<string, OptionErrorHandlerCreator> {}
-interface OptionErrorHandlerCreator {
+interface HandlerMap extends Record<string, HandlerCreator> {}
+interface HandlerCreator {
   (
     collectError: (e: Error) => void,
     showMessage: ShowErrorMessage,
   ): ErrorHandler;
 }
 
-interface ErrorHandlerCreator {
-  (
-    ...args: [HandlerMap, ...Parameters<OptionErrorHandlerCreator>]
-  ): ErrorHandler[];
+interface ConfigHandlerCreator {
+  (...args: [HandlerMap, ...Parameters<HandlerCreator>]): ErrorHandler;
 }
 
 interface ErrorHandlerConfig {
   collectError: (e: Error) => void;
   showErrorMessage: ShowErrorMessage;
-  getHandlers: ErrorHandlerCreator;
+  getHandlers: (
+    ...parameters: Parameters<ConfigHandlerCreator>
+  ) => ErrorHandler[];
 }
 
 interface OptionErrorHandlerConfig
   extends Pick<ErrorHandlerConfig, 'showErrorMessage'> {
-  getHandlers: ErrorHandlerCreator;
+  getHandlers: ConfigHandlerCreator;
 }
 
 const DEFAULT_ERROR_HANDLER: Record<string, ErrorHandler> = {
@@ -40,8 +40,14 @@ const DEFAULT_ERROR_HANDLER: Record<string, ErrorHandler> = {
 
 const DEFAULT_CONFIG: ErrorHandlerConfig = {
   collectError: () => {},
-  getHandlers: Object.values,
   showErrorMessage: console.log,
+  getHandlers: (handlerMap, collectError, showErrorMessage) => {
+    const formate = compose(
+      map((fn) => fn(collectError, showErrorMessage)),
+      Object.values,
+    );
+    return formate(handlerMap);
+  },
 };
 
 const errorHandle =
