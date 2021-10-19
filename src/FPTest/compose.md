@@ -1,3 +1,7 @@
+---
+order: 2
+---
+
 # 代码组合 compose
 
 ```javascript

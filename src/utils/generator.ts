@@ -131,3 +131,21 @@ export const objectify =
     });
     return object;
   };
+
+export const mapTree = <T = any>(
+  treeData: T[],
+  func: (item: T) => any,
+  getChildren: (item: T) => T[],
+): ReturnType<typeof func>[] => {
+  let next = element(treeData);
+  return harvest(() => {
+    let item = next();
+    if (item !== undefined) {
+      const children = getChildren(item);
+      if (Array.isArray(children) && children.length) {
+        next = concat(element(children), next);
+      }
+      return func(item);
+    }
+  });
+};
